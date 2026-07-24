@@ -1,0 +1,118 @@
+name: 'SAST Seed'
+
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: 'Model to triage with — picks its endpoint and API key automatically'
+        type: choice
+        required: true
+        default: deepseek-v4-pro
+        options:
+          - deepseek-v4-flash
+          - deepseek-v4-pro
+          - kimi-k3
+          - kimi-k2.7-code
+          - claude-opus-4-8
+          - claude-sonnet-5
+
+# contents:write + pull-requests:write let the cache-review PR step push a
+# branch and open the PR. On fork PRs the token is read-only, which is why that
+# step is gated to non-pull_request events below.
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sast-triage-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    env:
+      SAMPLE_SIZE: 20 # test cases, not findings — see sample_benchmark.py
+      MODEL: ${{ inputs.model }}
+    steps:
+      - name: 'Check out Git repository'
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
+
+      - name: Scan
+        run: |
+          curl -fsSLo /usr/local/bin/opengrep \
+            https://github.com/opengrep/opengrep/releases/download/v1.25.0/opengrep_manylinux_x86
+          chmod +x /usr/local/bin/opengrep
+          git clone --depth 1 https://github.com/opengrep/opengrep-rules /tmp/rules
+          opengrep scan -f /tmp/rules/java \
+            --sarif --dataflow-traces --output findings.sarif
+
+      - name: 'Resolve endpoint for model'
+        id: endpoint
+        run: |
+          provider=
+          case "$MODEL" in
+            deepseek-*) base_url=https://api.deepseek.com/v1; key_name=DEEPSEEK_API_KEY ;;
+            kimi-*)     base_url=https://api.moonshot.ai/v1;  key_name=MOONSHOT_API_KEY ;;
+            claude-*)   base_url=; provider=anthropic;        key_name=ANTHROPIC_API_KEY ;;
+            *) echo "::error::No endpoint mapping for model '$MODEL'"; exit 1 ;;
+          esac
+          echo "provider=$provider" >> "$GITHUB_OUTPUT"
+          echo "base_url=$base_url" >> "$GITHUB_OUTPUT"
+          echo "key_name=$key_name" >> "$GITHUB_OUTPUT"
+          echo "Triaging with $MODEL at ${base_url:-${provider} default endpoint} (key: $key_name)"
+
+      - name: Triage
+        uses: alexpermiakov/sast-triage@v1
+        with:
+          provider: ${{ steps.endpoint.outputs.provider }}
+          model: ${{ env.MODEL }}
+          api-key: ${{ secrets[steps.endpoint.outputs.key_name] }}
+          base-url: ${{ steps.endpoint.outputs.base_url }}
+          max-findings-budget: ${{ steps.sample.outputs.findings }}
+          parallel: 3 # 4
+          sarif-file: findings.sarif
+          effort: large
+          scope: full
+          mode: baseline
+          cache-write: pr
+
+      - name: 'Publish triage report to run summary'
+        if: always()
+        run: '[ -f triage-report.md ] && cat triage-report.md >> "$GITHUB_STEP_SUMMARY" || true'
+
+      # Agent input + output, downloadable from the run's Artifacts section.
+      - name: 'Upload triage artifacts (agent input + output)'
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: sast-triage-${{ github.run_id }}
+          path: |
+            findings.sarif
+            triaged.sarif
+            triage-report.md
+            triage-cache.json
+          retention-days: 7
+          if-no-files-found: warn
+
+      - name: 'Refresh verdict-cache review PR'
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -z "$(git status --porcelain -- triage-cache.json)" ]; then
+            echo "cache unchanged; no PR"; exit 0
+          fi
+          BRANCH="triage/${{ github.ref_name }}"
+          git config user.name "sast-triage-bot"
+          git config user.email "sast-triage-bot@users.noreply.github.com"
+          git checkout -B "$BRANCH"
+          git add triage-cache.json
+          git commit -m "chore(triage): verdict cache update $(date -u +%Y-%m-%dT%H:%MZ) [skip ci]"
+          git push -f origin "$BRANCH"
+          if [ "$(gh pr list --head "$BRANCH" --state open --json number --jq length)" != "0" ]; then
+            gh pr edit "$BRANCH" --body-file triage-report.md
+          elif ! gh pr create --head "$BRANCH" --base "${{ github.ref_name }}" \
+                 --title "SAST triage: verdict cache update" --body-file triage-report.md; then
+            echo "::error::Enable Settings → Actions → General → 'Allow GitHub Actions to create and approve pull requests'."
+            exit 1
+          fi
