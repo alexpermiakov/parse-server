@@ -68,8 +68,8 @@ jobs:
           model: ${{ env.MODEL }}
           api-key: ${{ secrets[steps.endpoint.outputs.key_name] }}
           base-url: ${{ steps.endpoint.outputs.base_url }}
-          max-findings-budget: 20
-          parallel: 3 # 4
+          max-findings-budget: 0
+          #parallel: 3 # 4
           sarif-file: findings.sarif
           effort: large
           scope: full
