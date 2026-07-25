@@ -1,0 +1,1089 @@
+{
+  "version": 1,
+  "entries": {
+    "04f566c31aad77e7e53799bfdaabaaf4c79d9e1134fa3a198c6e63c7feed42217f7f67ca2933dde531606880661e13ad370cf857a71a75b01ec93f55c2bea17a_0": {
+      "ruleId": "tmp.rules.javascript.lang.security.audit.path-traversal.path-join-resolve-traversal",
+      "file": "src/Utils.js",
+      "verdict": "benign",
+      "reason": "The scanner-traced source defaultPath (and thus file = path.basename(defaultPath) at Utils.js:45) is not attacker-controlled: the only caller (PagesRouter.js:305) passes defaultPagePath(page.defaultFile) where defaultFile is a hardcoded constant from the frozen pages map (PagesRouter.js:12-42). The actually request-influenced input locale is validated in getLocale against /^[a-zA-Z]{2,3}(-[a-zA-Z0-9]{2,8})*$/ and rejected (returns undefined) otherwise, so no '/' or '..' sequences can reach path.join; additionally readFile normalizes the path and throws unless it remains under pagesPath, containing any traversal.",
+      "evidence": [
+        "src/Utils.js:43-54",
+        "src/Routers/PagesRouter.js:12-42",
+        "src/Routers/PagesRouter.js:283-312",
+        "src/Routers/PagesRouter.js:547-562",
+        "src/Routers/PagesRouter.js:495-507"
+      ],
+      "codeHash": "sha256:bf25d205eae0fb56904f7b5c5775f6409b34d2bed084c1e943c9650d5a0a1ff0",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:00:50Z",
+      "tokensUsed": 64101
+    },
+    "04f566c31aad77e7e53799bfdaabaaf4c79d9e1134fa3a198c6e63c7feed42217f7f67ca2933dde531606880661e13ad370cf857a71a75b01ec93f55c2bea17a_1": {
+      "ruleId": "tmp.rules.javascript.lang.security.audit.path-traversal.path-join-resolve-traversal",
+      "file": "src/Utils.js",
+      "verdict": "uncertain",
+      "reason": "token budget exhausted (239854 of 120000 tokens used; the next call would exceed the budget)",
+      "evidence": null,
+      "codeHash": "sha256:2dd953cc18c698f6bad4b226b28622946a49588fa162786b577766fc343eec75",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:00:05Z",
+      "tokensUsed": 239854
+    },
+    "0729d27d63ad4778fcc6429ff0d790b325d3256dec300adc8d76daf9865b47afc7f006123fed7bdc2cb0ce86668b0720f61e97f41a939fe9f2329789f0f495f0_0": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged JSON.stringify at spec/ParseQuery.spec.js:3355 serializes a single-key object ({ objectId: obj.id }) into the `where` query-string parameter of an HTTP request to the Parse server under test (lines 3351-3358). It is not used to produce object keys where stable key ordering matters; with one key, ordering is irrelevant, and the server parses the string as JSON. The value obj.id comes from a test fixture object created and saved at lines 3324-3325, not from attacker input, and the entire context is a test spec asserting response fields (line 3359). The scanner's taint trace (stringify -\u003e response3 -\u003e sink) is spurious; the stringify output never flows into response3, and there is no correctness or security defect.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3324-3325",
+        "spec/ParseQuery.spec.js:3351-3359"
+      ],
+      "codeHash": "sha256:28947ea68582124e5df93e2612e7ecd8f7d6e1670f47f7100d3d32b46ce2c002",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:00:35Z",
+      "tokensUsed": 8280
+    },
+    "0729d27d63ad4778fcc6429ff0d790b325d3256dec300adc8d76daf9865b47afc7f006123fed7bdc2cb0ce86668b0720f61e97f41a939fe9f2329789f0f495f0_1": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged line is a test assertion, and the traced JSON.stringify at line 3355 serializes a single-key literal ({ objectId: obj.id }) into the 'where' query-string parameter of an HTTP request in a spec file. Key-ordering stability is irrelevant for a one-property object, and the string is consumed as a query constraint by the Parse REST API, not used to derive object keys, cache keys, or hashes. The rule's concern (unstable key ordering when relying on stringify output as an identifier) does not apply, and this is test code with no attacker-controlled input reaching a sensitive sink.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3351-3358",
+        "spec/ParseQuery.spec.js:3359-3361",
+        "spec/ParseQuery.spec.js:3323"
+      ],
+      "codeHash": "sha256:bbf278033d1998d92fbb6b46b5f036a1b443da12e529fc05c61e52c58b2768b6",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:00:55Z",
+      "tokensUsed": 7988
+    },
+    "0729d27d63ad4778fcc6429ff0d790b325d3256dec300adc8d76daf9865b47afc7f006123fed7bdc2cb0ce86668b0720f61e97f41a939fe9f2329789f0f495f0_10": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "In test spec code, JSON.stringify({ objectId: obj.id }) at line 3588 serializes a single-key object literal (key ordering trivially deterministic) to build a 'where' query-string parameter of an HTTP request (lines 3584-3591); it is not used as an object key for caching/lookup, and the flagged line 3593 is only a test assertion on the response body. No reliance on key ordering and no attacker-controlled input reaches any sensitive sink.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3584-3591",
+        "spec/ParseQuery.spec.js:3588",
+        "spec/ParseQuery.spec.js:3592-3596"
+      ],
+      "codeHash": "sha256:4a0cd00d4f8a906693b6011fd8ac4a2a1b509364e7c3c95a8a7cb527028828a6",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:01:28Z",
+      "tokensUsed": 13416
+    },
+    "0729d27d63ad4778fcc6429ff0d790b325d3256dec300adc8d76daf9865b47afc7f006123fed7bdc2cb0ce86668b0720f61e97f41a939fe9f2329789f0f495f0_11": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged code is in a test spec (spec/ParseQuery.spec.js). JSON.stringify is applied to a single-key object literal `{ objectId: obj.id }` at line 3588 to build a `where` query-string parameter for an HTTP request against the test server (lines 3584-3591). With only one key there is no key-ordering ambiguity, and the result is not used as an object key/map lookup anyway — it is sent as a query constraint, and the sink at line 3594 is just an assertion on the response. No attacker-controlled input and no reliance on stable serialization exist here; the rule's concern (unstable key ordering used as object keys) does not apply.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3584-3594"
+      ],
+      "codeHash": "sha256:e551b56ed10ac002920f5a6ce851dae8b9fc83caa688c31dce0f8df3c25a0848",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:01:11Z",
+      "tokensUsed": 6958
+    },
+    "0729d27d63ad4778fcc6429ff0d790b325d3256dec300adc8d76daf9865b47afc7f006123fed7bdc2cb0ce86668b0720f61e97f41a939fe9f2329789f0f495f0_12": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged line is a Jest assertion in a test spec, and the traced JSON.stringify at line 3588 serializes a single-key literal `{ objectId: obj.id }` into the `where` query-string parameter of an HTTP request in a test. Key-ordering stability is irrelevant: the object has exactly one key, and the string is not used to derive an object key or cache lookup — it is parsed server-side as a query filter. There is no attacker-controlled input and no reliance on key ordering, so the rule's concern does not apply.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3584-3591",
+        "spec/ParseQuery.spec.js:3588",
+        "spec/ParseQuery.spec.js:3595"
+      ],
+      "codeHash": "sha256:6bf375c14c9cc9d0e0d7c6f420cc70dd01aadf37fb68fb167ebb521abe831040",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:01:32Z",
+      "tokensUsed": 7035
+    },
+    "0729d27d63ad4778fcc6429ff0d790b325d3256dec300adc8d76daf9865b47afc7f006123fed7bdc2cb0ce86668b0720f61e97f41a939fe9f2329789f0f495f0_13": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The rule targets JSON.stringify used to produce stable object keys (e.g., cache/Map keys) where key ordering matters. Here JSON.stringify({ objectId: obj.id }) at line 3588 is used only to serialize a single-key object into the 'where' query-string parameter of an HTTP request to the Parse REST API (lines 3584-3591). The server JSON-parses this as a query constraint, so key ordering is semantically irrelevant, and the object has only one key anyway. The scanner's taint trace is also incoherent: the 'sink' response3.data.results[0] is the HTTP response body, not a consumption of the stringified value as an object key. Additionally this is a test spec file, not production code. No real defect.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3584-3591",
+        "spec/ParseQuery.spec.js:3588",
+        "spec/ParseQuery.spec.js:3592-3596"
+      ],
+      "codeHash": "sha256:c77306bb19837c2d79a32fb6021a1bf3add6bb5945755264d9fe7ccbb213f35a",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:01:50Z",
+      "tokensUsed": 7187
+    },
+    "0729d27d63ad4778fcc6429ff0d790b325d3256dec300adc8d76daf9865b47afc7f006123fed7bdc2cb0ce86668b0720f61e97f41a939fe9f2329789f0f495f0_14": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged JSON.stringify at spec/ParseQuery.spec.js:3649 serializes a single-key object ({ objectId: obj.id }) into the 'where' query-string parameter of an HTTP request inside a test spec. It is not used to produce an object/cache key, so stable key ordering is irrelevant — and with only one key there is no ordering to vary. The scanner's taint trace is also incoherent: 'response3' (line 3645) is the HTTP response awaiting the request that consumes the stringify, not a propagator of it, and the 'sink' response3.data.results[0] (line 3653) merely reads fields of the query response in a test assertion. This is a false positive in test code with no security or correctness impact.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3645-3652",
+        "spec/ParseQuery.spec.js:3649",
+        "spec/ParseQuery.spec.js:3653-3657"
+      ],
+      "codeHash": "sha256:3b6d4c0b6bc7883cba641aba3a1d5c2c3da3a784097f2eb3c08b7734c73a5cae",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:02:03Z",
+      "tokensUsed": 7001
+    },
+    "0729d27d63ad4778fcc6429ff0d790b325d3256dec300adc8d76daf9865b47afc7f006123fed7bdc2cb0ce86668b0720f61e97f41a939fe9f2329789f0f495f0_15": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The rule targets reliance on JSON.stringify key ordering, but at line 3649 the stringified value is a single-key object literal ({ objectId: obj.id }) used only as a 'where' query-string parameter in a test HTTP request; with one key there is no ordering ambiguity, the string is not used as a lookup or persistent key, and the flagged sink at line 3654 is just a test assertion reading a response field, unrelated to key ordering. This is test-only spec code where the defect cannot manifest.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3645-3654",
+        "spec/ParseQuery.spec.js:3649",
+        "spec/ParseQuery.spec.js:3654"
+      ],
+      "codeHash": "sha256:3ab4cfca10c061d168d147141808efa3def3dc6a81da15ba0d081f4c0fe53c11",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:02:22Z",
+      "tokensUsed": 12824
+    },
+    "0729d27d63ad4778fcc6429ff0d790b325d3256dec300adc8d76daf9865b47afc7f006123fed7bdc2cb0ce86668b0720f61e97f41a939fe9f2329789f0f495f0_16": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The JSON.stringify at line 3649 serializes a single-key object ({ objectId: obj.id }) into the 'where' query-string parameter of an HTTP request in a test spec; it is not used to produce object keys, and with exactly one key there is no ordering nondeterminism to exploit. The flagged line 3655 merely asserts a property on the HTTP response and performs no stringify; the scanner's taint hop from the stringify output into response3 is spurious. This is test code asserting server behavior, not production key generation.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3645-3652",
+        "spec/ParseQuery.spec.js:3649",
+        "spec/ParseQuery.spec.js:3653-3657"
+      ],
+      "codeHash": "sha256:d02bf94309af55e4f225b122afec63bef76b86d6f5f0421acdcd73fceae10d32",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:02:17Z",
+      "tokensUsed": 6910
+    },
+    "0729d27d63ad4778fcc6429ff0d790b325d3256dec300adc8d76daf9865b47afc7f006123fed7bdc2cb0ce86668b0720f61e97f41a939fe9f2329789f0f495f0_17": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged line is a test assertion in a spec file. The JSON.stringify at line 3649 serializes a single-property object literal ({ objectId: obj.id }) into a 'where' query-string parameter of an HTTP request to the test server. With exactly one key there is no key-ordering nondeterminism possible, and the string is consumed by the server as a JSON query filter, not relied upon as a stable lookup/cache key. The scanner's taint trace (response3 derived from the stringify) is not real data flow: response3 is the HTTP response at line 3645, and line 3656 merely asserts on response3.data.results[0].foo. No security or correctness defect is reachable here.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3645-3652",
+        "spec/ParseQuery.spec.js:3649",
+        "spec/ParseQuery.spec.js:3653-3657"
+      ],
+      "codeHash": "sha256:6e675870e503c8211810434ae9a1588e6d2dbe58b2e576ce6ebb2a1a5549f8af",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:02:21Z",
+      "tokensUsed": 6867
+    },
+    "0729d27d63ad4778fcc6429ff0d790b325d3256dec300adc8d76daf9865b47afc7f006123fed7bdc2cb0ce86668b0720f61e97f41a939fe9f2329789f0f495f0_18": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged code is in a test spec (spec/ParseQuery.spec.js) inside an 'exclude keys (strings)' test case. JSON.stringify at line 3649 serializes a single-key object literal { objectId: obj.id } to build the 'where' query-string parameter of an HTTP request to the test Parse server (lines 3645-3652). With only one key, key ordering is irrelevant, and the stringified output is used as a query clause, not as an object key/lookup identifier, so the unstable-ordering concern of the rule cannot manifest. The sink at line 3657 is just a Jest assertion on the response. No attacker input is involved; this is a false positive in test code.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3645-3652",
+        "spec/ParseQuery.spec.js:3649",
+        "spec/ParseQuery.spec.js:3653-3657"
+      ],
+      "codeHash": "sha256:219d22152e99a7c5c16f52f7b5b3c503721bde1798ddac6742484cc143d23ced",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:02:30Z",
+      "tokensUsed": 6763
+    },
+    "0729d27d63ad4778fcc6429ff0d790b325d3256dec300adc8d76daf9865b47afc7f006123fed7bdc2cb0ce86668b0720f61e97f41a939fe9f2329789f0f495f0_2": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged JSON.stringify({ objectId: obj.id }) at line 3355 is used only as the 'where' query-string parameter of a test HTTP request (lines 3351-3358) in a spec file. It is not used to derive an object/map/cache key, so stable key ordering is irrelevant; the server JSON.parses the string as a query constraint. The object also has a single key, so no ordering ambiguity exists. The scanner's 'sink' at line 3361 is merely a test assertion reading response3.data.results[0].hello, which does not depend on stringify key ordering at all. No correctness or security impact.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3351-3361",
+        "spec/ParseQuery.spec.js:3355"
+      ],
+      "codeHash": "sha256:57f35f0ae9c2184645f21676e5a0aa059fad5e0e19cf433cb8927eee2362cb66",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:02:52Z",
+      "tokensUsed": 8195
+    },
+    "0729d27d63ad4778fcc6429ff0d790b325d3256dec300adc8d76daf9865b47afc7f006123fed7bdc2cb0ce86668b0720f61e97f41a939fe9f2329789f0f495f0_3": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "This is test code where JSON.stringify({ objectId: obj.id }) is used at line 3432 only to serialize a `where` query parameter for an HTTP request to the Parse REST API (qs.where at lines 3430-3433), not to produce an object/map key whose lookup depends on key ordering. The stringified object has a single key (`objectId`), so ordering is trivially deterministic regardless of engine behavior, and the response at line 3436 is just asserted on for test correctness. There is no reliance on stable multi-key serialization, so the rule's concern does not apply.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3428-3436"
+      ],
+      "codeHash": "sha256:68967d7fd3f453501c8559db129ba1351a68247cce1550d21473ce5f18f1b675",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:02:44Z",
+      "tokensUsed": 7855
+    },
+    "0729d27d63ad4778fcc6429ff0d790b325d3256dec300adc8d76daf9865b47afc7f006123fed7bdc2cb0ce86668b0720f61e97f41a939fe9f2329789f0f495f0_4": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged JSON.stringify call serializes a single-key object literal ({ objectId: obj.id }) into the 'where' query-string parameter of a test HTTP request. Key ordering is irrelevant: there is only one key, and the result is not used as a lookup/cache key — it is parsed by the server as a JSON query constraint. This is test code (spec/ParseQuery.spec.js), the input is a locally constructed TestObject id, not attacker-controlled, and no stable-ordering guarantee is relied upon. The rule's concern (unstable key ordering for object keys) does not apply.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3428-3435",
+        "spec/ParseQuery.spec.js:3432",
+        "spec/ParseQuery.spec.js:3436-3441"
+      ],
+      "codeHash": "sha256:b3e917813d8182894b3f054ab8fb0c3f42df41c16a14bd1381c59b762f56a2f7",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:02:50Z",
+      "tokensUsed": 7896
+    },
+    "0729d27d63ad4778fcc6429ff0d790b325d3256dec300adc8d76daf9865b47afc7f006123fed7bdc2cb0ce86668b0720f61e97f41a939fe9f2329789f0f495f0_5": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged code is in a test spec. The JSON.stringify call at line 3432 serializes a single-key object ({ objectId: obj.id }) as the 'where' query-string parameter of an HTTP request to the Parse test server; with only one key there is no key-ordering nondeterminism to rely on, and the result is used as a query filter, not to produce object keys or any ordering-dependent artifact (e.g., cache keys, hashes, signatures). The scanner's claimed sink at line 3438 merely asserts that response3.data.results[0].updatedAt is set — it does not consume the stringified value at all, so the taint trace is spurious. No exploitable or correctness-relevant behavior exists here.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3428-3438",
+        "spec/ParseQuery.spec.js:3432"
+      ],
+      "codeHash": "sha256:7e199e21525ab699ab5c88568e910092d6cdf48a16a09ac6553e1dc055be8451",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:03:04Z",
+      "tokensUsed": 7826
+    },
+    "0729d27d63ad4778fcc6429ff0d790b325d3256dec300adc8d76daf9865b47afc7f006123fed7bdc2cb0ce86668b0720f61e97f41a939fe9f2329789f0f495f0_6": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "JSON.stringify at line 3432 serializes a single-key object literal solely to build the 'where' query parameter of a test HTTP request (lines 3428-3435); the server parses it as a query constraint, so key ordering is irrelevant and the output is never used as an object or cache key. The flagged sink at line 3439 is a Jest assertion on the response data, not a key-ordering-dependent operation. This is test code, not a production path.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3428-3435",
+        "spec/ParseQuery.spec.js:3432",
+        "spec/ParseQuery.spec.js:3439"
+      ],
+      "codeHash": "sha256:8ca92cf3b682a5a4e9d9ef03d53f136e08b1a2ee4116097be3706e4b66422f1f",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:03:20Z",
+      "tokensUsed": 15052
+    },
+    "0729d27d63ad4778fcc6429ff0d790b325d3256dec300adc8d76daf9865b47afc7f006123fed7bdc2cb0ce86668b0720f61e97f41a939fe9f2329789f0f495f0_7": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged code is a test spec. The JSON.stringify at line 3432 serializes a single-key object ({ objectId: obj.id }) into the 'where' query parameter of an HTTP request to the Parse REST API; the server JSON.parses it as a query constraint. It is not used to produce object keys or any value whose correctness depends on stable key ordering (and with a single key, ordering is irrelevant). The sink at line 3440 is merely an assertion on the response payload. The rule's concern (stringify output relied on as a stable key) does not apply.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3428-3441",
+        "spec/ParseQuery.spec.js:3432"
+      ],
+      "codeHash": "sha256:f1bc689f48bd00247b3db34430130e8bdf2d426b3f0ba2a67db88106d8f6bc25",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:03:08Z",
+      "tokensUsed": 7783
+    },
+    "0729d27d63ad4778fcc6429ff0d790b325d3256dec300adc8d76daf9865b47afc7f006123fed7bdc2cb0ce86668b0720f61e97f41a939fe9f2329789f0f495f0_8": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The JSON.stringify at spec/ParseQuery.spec.js:3432 serializes a single-key object ({ objectId: obj.id }) into the 'where' query-string parameter of an HTTP request in a test spec; the server JSON-parses this value, so key ordering is irrelevant and it is not used to produce object/cache keys as the rule intends. Additionally, a single-key object has no ordering ambiguity, and the flagged sink at line 3441 is just a test assertion reading response data. This is a false positive in test code.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3428-3435",
+        "spec/ParseQuery.spec.js:3432",
+        "spec/ParseQuery.spec.js:3441"
+      ],
+      "codeHash": "sha256:c1e316940073ae0b930863efb6987a013ffb4e78c0f0f3b4aaa43ece8932f1c9",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:03:23Z",
+      "tokensUsed": 7843
+    },
+    "0729d27d63ad4778fcc6429ff0d790b325d3256dec300adc8d76daf9865b47afc7f006123fed7bdc2cb0ce86668b0720f61e97f41a939fe9f2329789f0f495f0_9": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "This is a test spec, not production code. The JSON.stringify call at line 3588 serializes a single-key object literal `{ objectId: obj.id }`, so key ordering is trivially irrelevant. The result is passed as the `where` query-string parameter of an HTTP request (lines 3584-3591) and is parsed as JSON by the server — it is never used as a map/cache key where stable ordering would matter. The flagged 'sink' at line 3592 is merely a test assertion reading the HTTP response; there is no attacker-controlled input (obj.id is created by the test itself at lines 3553-3554) and no security-relevant sink. The rule's concern about unstable key ordering cannot manifest with a one-key object consumed by a JSON parser.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3584-3592",
+        "spec/ParseQuery.spec.js:3552-3554"
+      ],
+      "codeHash": "sha256:0ccd4592c56621719825c0996b288f5be726697c12a5ec3f41a50779818af79c",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:03:28Z",
+      "tokensUsed": 7062
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_0": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "JSON.stringify at line 3331 builds the 'where' query-string parameter of a test HTTP request (lines 3327-3334); the serialized JSON is parsed server-side as a query filter, not used as a lookup/map key, so key-ordering stability is irrelevant, and the object has only one key anyway. The flagged line 3335 is a Jest assertion on the response, and this is test spec code with no correctness or security impact.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3327-3335",
+        "spec/ParseQuery.spec.js:3331"
+      ],
+      "codeHash": "sha256:806ad0f5b67bc37123c775c1af15f93727a2d70e120723ee75c4b4b0dc06cb71",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:04:00Z",
+      "tokensUsed": 15373
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_1": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "JSON.stringify at spec/ParseQuery.spec.js:3331 serializes a single-property object ({ objectId: obj.id }) only to build the 'where' query-string parameter of a test HTTP request (lines 3327-3334); the server JSON-parses it, so it is never used as an object/map key and ordering is irrelevant (trivially stable with one key). The flagged sink at line 3336 is just a test assertion reading response.data.results[0].bar; no stringify-derived key is produced or consumed in this path. Test-only code, false positive.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3327-3334",
+        "spec/ParseQuery.spec.js:3331",
+        "spec/ParseQuery.spec.js:3335-3337"
+      ],
+      "codeHash": "sha256:76148359470d8974fab9f2c3021c49dabe235d7c3287b612d569f267b9e892d3",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:04:03Z",
+      "tokensUsed": 15639
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_10": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged JSON.stringify is in a test spec file and is used only to serialize a single-key object ({ objectId: obj.id }) into the 'where' query-string parameter of an HTTP request (lines 3556-3561). The string is not used as an object/cache key where ordering matters — it is parsed server-side as a JSON query clause, and with a single key there is no key-ordering ambiguity at all. The scanner's sink at line 3565 is just a test assertion on the response data, unrelated to any key-ordering reliance. This is a false positive for the no-stringify-keys rule.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3552-3561",
+        "spec/ParseQuery.spec.js:3564-3568"
+      ],
+      "codeHash": "sha256:65470b71169e399d87a63ece421e98f5a73d0226aafa2f9c98201af7bba21c97",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:03:50Z",
+      "tokensUsed": 7084
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_11": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "JSON.stringify({ objectId: obj.id }) at line 3560 serializes a single-key object into the 'where' query-string parameter of a test HTTP request (lines 3556-3563). It is not used as an object/cache key requiring stable ordering — the server JSON.parses it as a query filter — and with one property there is no ordering ambiguity. The flagged sink at line 3566 is only a test assertion reading response.data.results[0].updatedAt, which does not depend on stringify ordering at all.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3556-3563",
+        "spec/ParseQuery.spec.js:3564-3568"
+      ],
+      "codeHash": "sha256:a3c44efe945d1ae9c319845dc41b188ee0d032e34a04c3c0fe59ca7a6ef64a78",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:04:41Z",
+      "tokensUsed": 14065
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_12": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged JSON.stringify at line 3560 serializes a single-key object ({ objectId: obj.id }) into the 'where' query-string parameter of an HTTP request to the Parse server. The server JSON-parses this parameter, so key ordering is irrelevant to correctness; additionally, with only one key there is no ordering ambiguity at all. The stringify result is not used as an object/map key (the concern of the rule), and this is test code asserting query behavior, not production key generation. The scanner's sink line 3567 is merely a test assertion reading the response.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3556-3563",
+        "spec/ParseQuery.spec.js:3560",
+        "spec/ParseQuery.spec.js:3564-3568"
+      ],
+      "codeHash": "sha256:4fa4d5702852f6d76879506641978257df1006ed48466b1ca273a991f028d795",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:04:27Z",
+      "tokensUsed": 7357
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_13": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged line 3568 contains no JSON.stringify at all — it is a test assertion reading response.data.results[0].hello; the scanner's taint trace incorrectly links it to the stringify at line 3560. That stringify serializes a single-key object literal { objectId: obj.id } into the 'where' query-string parameter of an HTTP request (lines 3556-3563), not into an object key. The server parses this JSON semantically as a query filter, so key ordering is irrelevant, and with only one key the output is deterministic regardless. Additionally this is test code in spec/, not production code relying on stringify for key generation.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3556-3563",
+        "spec/ParseQuery.spec.js:3560",
+        "spec/ParseQuery.spec.js:3564-3568"
+      ],
+      "codeHash": "sha256:67f28e3552289dc6687ae8f1fad90ce8877eebdc3ccfa3b73997b2bf619ffd7c",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:04:39Z",
+      "tokensUsed": 7615
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_14": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The JSON.stringify result is never used as an object key. At spec/ParseQuery.spec.js:3621 it serializes { objectId: obj.id } into the `where` query-string parameter of an HTTP test request (request({ url, qs: { excludeKeys: 'foo', where: JSON.stringify(...) } }, lines 3617-3624)), which the server parses as a query filter; key ordering of a single-property serialized object is irrelevant and the rule's concern (stringify output used as a lookup/cache key) does not apply. The flagged sink at line 3625 is only a test assertion reading response.data.results[0].objectId. This is test code exercising the excludeKeys REST parameter, not production logic relying on stable key ordering.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3617-3624",
+        "spec/ParseQuery.spec.js:3621",
+        "spec/ParseQuery.spec.js:3625"
+      ],
+      "codeHash": "sha256:f517df3c7990e7b67d2521722fc71145e99d40f4887699ead106a5282e0042ca",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:04:57Z",
+      "tokensUsed": 12814
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_15": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged sink at line 3626 is a test assertion reading response.data.results[0], unrelated to stringify key ordering. The actual JSON.stringify at line 3621 serializes a single-key object literal `{ objectId: obj.id }` where key ordering is definitionally irrelevant, and the output is sent as a `where` query parameter that the server JSON.parses — it is never relied on as a stable key or identifier. This is test code with no dependence on serialization order.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3617-3624",
+        "spec/ParseQuery.spec.js:3621",
+        "spec/ParseQuery.spec.js:3625-3629"
+      ],
+      "codeHash": "sha256:25e1be3064852b2e2260534d15f4d700c8bf2c1503dce762ea440c0fec090b10",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:05:24Z",
+      "tokensUsed": 13386
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_16": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The JSON.stringify call at line 3621 serializes a single-key object literal ({ objectId: obj.id }) to build the 'where' query-string parameter of a test HTTP request (lines 3617-3624). Key ordering is irrelevant for a one-property object, and the string is sent as a server query constraint, not used to produce object keys. The flagged line 3627 is a test assertion reading response.data.results[0].updatedAt, unrelated to key generation. This is test code with no reliance on JSON.stringify key ordering.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3617-3624",
+        "spec/ParseQuery.spec.js:3621",
+        "spec/ParseQuery.spec.js:3625-3629"
+      ],
+      "codeHash": "sha256:2fd5707287d66edec2197a9fc1aa90fdd4d3bb49f40e85916824ad54cb07d1f4",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:05:21Z",
+      "tokensUsed": 13093
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_17": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged JSON.stringify call serializes a single-key object literal ({ objectId: obj.id }) to build a Parse 'where' query parameter in a test. With only one key, key ordering is irrelevant, so the instability the rule warns about cannot occur. The string is used as a query constraint value, not to produce object keys, and the flagged line 3628 is just a test assertion on the response. No attacker input or security impact; this is test-only code.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3617-3624",
+        "spec/ParseQuery.spec.js:3621",
+        "spec/ParseQuery.spec.js:3628"
+      ],
+      "codeHash": "sha256:302231659ba16826dd3212c1c2759020791a4f8eda49a40e54542333cae432dc",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:05:15Z",
+      "tokensUsed": 6750
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_18": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged JSON.stringify call at spec/ParseQuery.spec.js:3621 serializes a single-property object ({ objectId: obj.id }) into the 'where' query-string parameter of an HTTP request in a test spec — exactly the JSON-encoded constraint format the Parse REST API expects. It is not used to produce an object key, and stable key ordering is irrelevant for a one-key object. The scanner's taint trace (stringify -\u003e 'response' variable -\u003e response.data.results[0]) is spurious: the stringify result flows into the outgoing request's qs, not into the response assertions. This is test code with no attacker-controlled input and no security sink.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3617-3624",
+        "spec/ParseQuery.spec.js:3621",
+        "spec/ParseQuery.spec.js:3625-3629"
+      ],
+      "codeHash": "sha256:f81d85557f55e2698352b9ced28beb3b6203845c862d9efd1d41954b5069ab9e",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:05:41Z",
+      "tokensUsed": 7136
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_19": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "This is a false positive in a test spec. The JSON.stringify at spec/ParseQuery.spec.js:3683 serializes a single-key object ({ objectId: obj.id }) to build a 'where' query-string parameter for an HTTP test request, not to produce an object key where ordering matters. Key-ordering stability is irrelevant for a one-property object, and the string is sent to the server as a query clause, not used as a lookup key. The flagged line 3687 is merely a test assertion (expect(response.data.results[0].foo).toBeUndefined()) and the scanner's taint trace from stringify through 'response' to the assertion has no semantic connection to the rule. There is no security or correctness defect here.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3674-3689",
+        "spec/ParseQuery.spec.js:3683",
+        "spec/ParseQuery.spec.js:3687"
+      ],
+      "codeHash": "sha256:82a34c9d5c9da2e00e176129bc49e303edfad910f0fce098987a4d5c24944b46",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:05:45Z",
+      "tokensUsed": 6824
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_2": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged code is a test spec building a REST query string: JSON.stringify({ objectId: obj.id }) serializes a single-key object into the `where` query parameter of an HTTP request to the Parse server (spec/ParseQuery.spec.js:3327-3334). The rule concerns relying on JSON.stringify for stable key ordering (e.g., cache keys/dedup), but here the output is not used as a key at all — the server JSON-parses the `where` clause, so key ordering is irrelevant, and with a single property there is no ordering ambiguity anyway. The sink line 3337 is just a Jest assertion on the response. No attacker-controlled input and no correctness defect; false positive.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3323-3337",
+        "spec/ParseQuery.spec.js:3331"
+      ],
+      "codeHash": "sha256:20d54ed1bb4f39ba12a6de78aa38c08f2042f370f95a633860f1fbe0cefd444c",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:05:49Z",
+      "tokensUsed": 8046
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_20": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged line is a Jest assertion in a test spec, not code relying on JSON.stringify key ordering. The JSON.stringify at line 3683 serializes { objectId: obj.id } (a single-key object) into a `where` query-string parameter for an HTTP request against the test server; its output is never used as an object key, cache key, or for any ordering-dependent comparison. The scanner's taint trace is incoherent: the stringify result is passed as `qs.where` in the request options, not assigned to `response` (which is the awaited HTTP response at line 3678), and line 3688 merely reads response.data.results[0].hello to assert it is undefined. No defect is reachable here.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3674-3688",
+        "spec/ParseQuery.spec.js:3683",
+        "spec/ParseQuery.spec.js:3688"
+      ],
+      "codeHash": "sha256:d61c3046551ae5be938073611445488749fd7fb41ea20e9c0d79f148c4b749d8",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:06:04Z",
+      "tokensUsed": 6842
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_21": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged code is in a test spec. The JSON.stringify at line 3700 serializes a single-key object literal ({ objectId: obj.id }) to build the 'where' query-string parameter of an HTTP request to the Parse server under test. With only one key there is no key-ordering ambiguity, and the string is not used as an object/map key for caching or lookup — it is parsed server-side as a query constraint. The 'sink' at line 3704 is just a test assertion on the response. No correctness or security impact.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3691-3706",
+        "spec/ParseQuery.spec.js:3700"
+      ],
+      "codeHash": "sha256:4528ebd32c773d774d29eabefd1687b85a0dd6c2af3282c762343be0b0b46ee7",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:06:02Z",
+      "tokensUsed": 6554
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_22": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged code is in a test spec file. At spec/ParseQuery.spec.js:3700, JSON.stringify is applied to a single-key object literal ({ objectId: obj.id }) to build a REST query 'where' parameter; with only one key there is no key-ordering to depend on, and the result is not used as an object key — it's sent as a query string value to the test server. The 'sink' at line 3705 is just a test assertion on the HTTP response (response.data.results[0].hello), which has nothing to do with stringify key ordering. No attacker-controlled input is involved; obj.id comes from a TestObject saved by the test itself.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3691-3706",
+        "spec/ParseQuery.spec.js:3700",
+        "spec/ParseQuery.spec.js:3705"
+      ],
+      "codeHash": "sha256:87584bed939f6b9cc21b2e1f0ae4696983eea6a3b3581345a823342c5baf751b",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:06:12Z",
+      "tokensUsed": 6609
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_23": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged JSON.stringify call at spec/ParseQuery.spec.js:3719 serializes an object literal with a single key ({ objectId: obj.id }), so key ordering cannot vary and there is no stable-ordering concern. The rule's premise (multi-key objects needing deterministic order for use as cache keys) does not apply: the stringified value is used as a 'where' query parameter in an HTTP request within a test spec, not as a lookup key, and this is test code, not production logic.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3714-3722",
+        "spec/ParseQuery.spec.js:3719",
+        "spec/ParseQuery.spec.js:3723"
+      ],
+      "codeHash": "sha256:a2f6ed213c6c89c325a36c822d7a0cd6ace581cf673969b0b22794faa8d29776",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:06:20Z",
+      "tokensUsed": 6506
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_24": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged line is a Jest assertion in a test spec with no JSON.stringify at all. The scanner's 'source' at line 3719 is `JSON.stringify({ objectId: obj.id })` used to build a `where` query-string parameter for an HTTP request inside a test — it is not used to produce object keys, hashes, or cache keys, so stable key ordering is irrelevant. The object literal also has exactly one key, so ordering is trivially deterministic. The claimed taint hop from that stringified parameter through the new `response` object (line 3714) to `response.data.results[0]` (line 3724) is spurious — `response` is the HTTP response, not derived from the stringify output. No attacker-controlled input and no reliance on key ordering exists here.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3714-3722",
+        "spec/ParseQuery.spec.js:3723-3724"
+      ],
+      "codeHash": "sha256:d30b37228fa286d220ae6207cb4b69b3889b3a101d04fcbeddd4f95fccf4a577",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:06:33Z",
+      "tokensUsed": 6867
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_25": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The rule targets JSON.stringify being relied on as a stable object key/hash, but here JSON.stringify({ objectId: obj.id }) is a single-key object serialized inside a test file solely to build the 'where' query-string parameter of an HTTP request to the server's own GET /classes/:className endpoint (spec/ParseQuery.spec.js:3737-3745). With one key there is no ordering to depend on, the string is not used as an object key, cache key, or hash, and the server just JSON.parse's it back into a query object (src/Routers/ClassesRouter.js:32-44, src/Routers/ClassesRouter.js:148-158). The flagged line is a jest assertion on the response, not a sink for any attacker-controlled data; this is test code, not production-reachable.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3737-3746",
+        "spec/ParseQuery.spec.js:3742",
+        "src/Routers/ClassesRouter.js:32-44",
+        "src/Routers/ClassesRouter.js:148-158"
+      ],
+      "codeHash": "sha256:a5b91a6fb6ff28dc71a924a80b753e57d350d9c563e00d85e5dc897f2c778d24",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:07:20Z",
+      "tokensUsed": 20766
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_26": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged line is a test assertion (expect(...).toEqual(...)) in a spec file, not a sink. The JSON.stringify at line 3742 serializes a single-key object literal ({ objectId: obj.id }) into the 'where' query-string parameter of an HTTP request in a test; it is not used to produce an object key, and with only one key there is no key-ordering nondeterminism to rely on. No attacker-controlled input or production code path is involved.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3737-3747",
+        "spec/ParseQuery.spec.js:3742",
+        "spec/ParseQuery.spec.js:3747"
+      ],
+      "codeHash": "sha256:b7832b73d7e09da503e31ff6cd60ecea6268cb7c2e599243eb10389f58d5fb17",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:06:47Z",
+      "tokensUsed": 6633
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_27": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The finding is in a test spec file, and the flagged 'sink' line 3748 is merely a test assertion (`expect(response.data.results[0].hello).toBe('world')`) that contains no JSON.stringify call at all. The scanner's trace points to the JSON.stringify at line 3742, which stringifies a single-key literal `{ objectId: obj.id }` to build a `where` query-string parameter for an HTTP test request — it is not used to produce object keys, and with exactly one key, key ordering is irrelevant. The `response` at line 3737 is just the awaited HTTP response assigned to a const; no unstable stringify output is consumed as a key anywhere on this path.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3737-3748",
+        "spec/ParseQuery.spec.js:3742",
+        "spec/ParseQuery.spec.js:3748"
+      ],
+      "codeHash": "sha256:a24158a8711d0e22e6ad2fbed63dae93fb4f563b9340a640e6ce0ff3183c9b01",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:06:56Z",
+      "tokensUsed": 6674
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_28": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The JSON.stringify at spec/ParseQuery.spec.js:3766 serializes a single-key object literal `{ objectId: obj.id }` as the `where` query-string parameter of an HTTP request in a test. Key ordering is irrelevant: (1) the object has exactly one key, so serialization is trivially deterministic, and (2) the string is not used to produce object keys — it is sent to the server, which JSON.parses it into a query constraint. The flagged line 3770 is merely a Jest `expect(...).toBeUndefined()` assertion on the response in a spec file, with no security-sensitive consumer of key ordering. No attacker-controlled input is involved; this is test code verifying excludeKeys behavior.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3761-3772",
+        "spec/ParseQuery.spec.js:3766",
+        "spec/ParseQuery.spec.js:3770"
+      ],
+      "codeHash": "sha256:fec871e48c48e55f0661caab9e4737ab7f737f39b77ecc526f2d1dfed6a2f6f3",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:07:11Z",
+      "tokensUsed": 6744
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_29": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The JSON.stringify at spec/ParseQuery.spec.js:3766 serializes a single-key object ({ objectId: obj.id }) into the 'where' query parameter of a test HTTP request; with one key there is no ordering nondeterminism, and the server JSON.parses the value so key order is irrelevant. The stringify result is not used as an object/cache key, the scanner's taint trace through the HTTP response object does not actually carry the stringified data, and this is test-only code.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3761-3769",
+        "spec/ParseQuery.spec.js:3770-3772"
+      ],
+      "codeHash": "sha256:ea3b8c00fe8d2ea6d5e2353ef24c5da6049652b8ef6b82480328fc26cfec7d4a",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:07:36Z",
+      "tokensUsed": 12815
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_3": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The JSON.stringify call flagged by the rule (spec/ParseQuery.spec.js:3402) serializes a single-key object literal ({ objectId: obj.id }) built inside a test, so key ordering is trivially stable and irrelevant. It is not used to derive object keys, hashes, or cache identifiers; it is only a `where` query parameter string sent to the test's own Parse server, and obj.id is generated within the test, not attacker-controlled. The scanner's claimed sink (response.data.results[0] at line 3406) is just reading the query response in a test assertion, which has nothing to do with stable stringification. This is a false positive in test code.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3394-3406",
+        "spec/ParseQuery.spec.js:3402"
+      ],
+      "codeHash": "sha256:a848d2eb2742c6f499c989ac598af8014b4948b234f4448bfaf57d29920c434e",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:07:30Z",
+      "tokensUsed": 7827
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_30": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The JSON.stringify at line 3766 serializes a single-key object ({ objectId: obj.id }) to build a 'where' query string in a test request; with only one key, key ordering is irrelevant. This is a spec file, not production code, and the result is sent as an HTTP query parameter to a local test server, not used as a lookup key or cache key. The scanner's taint trace (stringify -\u003e response -\u003e response.data.results[0]) is not a real data-flow: the response comes from the server request, not from the stringified value.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3751-3773",
+        "spec/ParseQuery.spec.js:3766",
+        "spec/ParseQuery.spec.js:3772"
+      ],
+      "codeHash": "sha256:7d38e4c62c71165a9235c1f12ffda1e954fe18d4aff1002acfbe2ff607a480c2",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:07:34Z",
+      "tokensUsed": 6524
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_4": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged JSON.stringify at spec/ParseQuery.spec.js:3402 builds a `where` query constraint serialized as an HTTP query-string parameter for a REST request in a test file (spec/ParseQuery.spec.js:3398-3405). It is not used to derive an object/map key whose stability matters — the string is parsed by the server under test, and the object has a single key (`objectId`), so key ordering is irrelevant regardless. The rule's concern (unstable key ordering used as a lookup key) does not apply here.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3398-3405",
+        "spec/ParseQuery.spec.js:3402",
+        "spec/ParseQuery.spec.js:3406-3407"
+      ],
+      "codeHash": "sha256:fc7f3e0c66ec862a4218959393dce9414442509b8a1204e5decdb88a3819a336",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:07:46Z",
+      "tokensUsed": 7892
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_5": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged code is in a test spec file, not production code. The JSON.stringify at line 3402 serializes a single-key object ({ objectId: obj.id }) into a 'where' query-string parameter for a REST API request — its intended purpose, not producing object keys as the rule targets. A single-key object has no key-ordering concern, and the server parses the JSON regardless of key order. The flagged line 3408 itself is merely a test assertion (ok(response.data.results[0].updatedAt, ...)) checking that the response contains an updatedAt field; no stringified output is used as an object key anywhere in this flow. There is no attacker-controlled input and no security impact.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3394-3408",
+        "spec/ParseQuery.spec.js:3402"
+      ],
+      "codeHash": "sha256:bd462f15d412a3ec604818cdbfc430dc958af9c53434a9d0c87e02e8ae8e059f",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:07:57Z",
+      "tokensUsed": 7973
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_6": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged code is a test assertion in a spec file, not production code. The JSON.stringify at line 3402 serializes a single-key object literal ({ objectId: obj.id }) to build a 'where' query parameter for a test HTTP request; with exactly one key there is no key-ordering nondeterminism possible, and the server parses the JSON by key name so ordering is semantically irrelevant regardless. The stringify output is never used as an object/map key (the rule's actual concern). The scanner's taint trace is fabricated: the stringify feeds the request query string, while 'response' (line 3398) is the awaited HTTP result and line 3409 merely asserts results[0].foo is undefined — no taint flow exists between them.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3394",
+        "spec/ParseQuery.spec.js:3398-3405",
+        "spec/ParseQuery.spec.js:3402",
+        "spec/ParseQuery.spec.js:3409"
+      ],
+      "codeHash": "sha256:9c8e515630f8dabad3647241c8460021ac247e7e3a24be2d5f75c33ca4cd2a46",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:08:03Z",
+      "tokensUsed": 8017
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_7": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The JSON.stringify call at spec/ParseQuery.spec.js:3402 stringifies a single-key object literal ({ objectId: obj.id }) to build the 'where' query-string parameter of an HTTP test request (lines 3398-3405); the server parses it as JSON, so key ordering is semantically irrelevant and the result is never used to produce object keys. The flagged line 3410 merely asserts on the HTTP response body (response.data.results[0].bar), which is unrelated to any stringify-derived key. Additionally this is test-spec code, not production logic, so the scanner's taint trace from stringify output to response data does not represent a real defect.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3398-3405",
+        "spec/ParseQuery.spec.js:3402",
+        "spec/ParseQuery.spec.js:3406-3411"
+      ],
+      "codeHash": "sha256:43724528e7f49f30cf0050eb8ad6d3647164dac9b094ff52f02aa11b229bc128",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:08:14Z",
+      "tokensUsed": 8009
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_8": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged code is a test assertion in a spec file. The JSON.stringify at line 3402 serializes a single-key object ({ objectId: obj.id }) into the 'where' query-string parameter of a test HTTP request against the Parse server REST API — it is not used to produce object keys, cache keys, or any lookup where key ordering matters. With exactly one key there is no ordering ambiguity, and the result is parsed server-side as a query filter, not used as a key. The scanner's taint trace (stringify -\u003e response -\u003e response.data.results[0]) is inapplicable to this correctness rule: the sink line 3411 merely asserts a response field is undefined.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3394-3411",
+        "spec/ParseQuery.spec.js:3402"
+      ],
+      "codeHash": "sha256:4b09a8aac340ad32843d4ce686792419bf91170fa64ed3ff2fa023e1886937cc",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:08:26Z",
+      "tokensUsed": 7990
+    },
+    "0addc47bf1aac6de3efd5bb696f7b09bc03553611bfbd2205738ac405c4e53811f03058fb5ee8a6f88a0c9f65f9391cbeab62ac3aef3c1ac68a0d922d4c2d48d_9": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The JSON.stringify call at spec/ParseQuery.spec.js:3560 serializes a single-key object literal ({ objectId: obj.id }) to build the 'where' query-string parameter of an HTTP request (qs.where at lines 3558-3561). It is not used to produce object keys for lookup, so key ordering cannot affect behavior; additionally the object has only one key, making ordering moot. The flagged line 3564 only asserts on the response data in a test file.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3552-3564",
+        "spec/ParseQuery.spec.js:3560"
+      ],
+      "codeHash": "sha256:4c81098a36c05bccd7f9f6bcaae6d30983c48efd6ec49f5317b0d40438e4d243",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:08:37Z",
+      "tokensUsed": 13425
+    },
+    "0afe8d30c19068f80886923df6076f53d8c8abbe8c0cd8d2f8cfe0fdbb5ace729f96c984f3faecb4708de08ef409c23c9c926af6ef8f7dcc21b2cdb404313b52_0": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/batch.spec.js",
+      "verdict": "benign",
+      "reason": "The rule targets JSON.stringify output relied upon as a stable object/map key, but here JSON.stringify at spec/batch.spec.js:633-638 serializes a fixed literal object purely as the HTTP request body sent to the /1/batch endpoint in a test. The flagged line 641 only asserts on the server's parsed response (result.data[0].success.objectId); no key ordering of the stringified output is relied upon anywhere. Additionally this is test code (spec/), not production logic, and the scanner's taint 'sink' is just an expect assertion.",
+      "evidence": [
+        "spec/batch.spec.js:629-639",
+        "spec/batch.spec.js:640-642"
+      ],
+      "codeHash": "sha256:5e97d1b4ff9709b9d2a36051d481efe1bfa7b23786826eebafd331c533592208",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:08:36Z",
+      "tokensUsed": 5577
+    },
+    "0afe8d30c19068f80886923df6076f53d8c8abbe8c0cd8d2f8cfe0fdbb5ace729f96c984f3faecb4708de08ef409c23c9c926af6ef8f7dcc21b2cdb404313b52_1": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/batch.spec.js",
+      "verdict": "benign",
+      "reason": "The JSON.stringify call at spec/batch.spec.js:633-638 serializes a literal object into an HTTP request body for a test POST to the batch endpoint. Key ordering is irrelevant here: the body is parsed by the server as JSON (where object key order has no semantic effect), and the stringified output is never used as an object key, cache key, or hash. The scanner's taint trace is spurious — `result` at line 629 is the awaited HTTP response from the test server, and `result.data[1]` at line 642 is the server's parsed response payload, not data derived from stringify's key ordering. There is no reliance on stable key ordering anywhere in this test; the rule's concern (using stringify output as a stable key) does not apply.",
+      "evidence": [
+        "spec/batch.spec.js:629-639",
+        "spec/batch.spec.js:640-642"
+      ],
+      "codeHash": "sha256:869f545a4541caa28352875c03d65d038aa1edc3733741841ed824a279e43cdb",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:08:43Z",
+      "tokensUsed": 5716
+    },
+    "0fc9760f938b641935cc843f76d91eb32062034feed9d9ad9f5434739fca79d3ec9591a53217340a63fe4f2207000363b866a025df8d1da38c8cb5e3e4b9a44f_0": {
+      "ruleId": "tmp.rules.javascript.lang.security.audit.unsafe-dynamic-method",
+      "file": "src/triggers.js",
+      "verdict": "uncertain",
+      "reason": "token budget exhausted (233151 of 120000 tokens used; the next call would exceed the budget)",
+      "evidence": null,
+      "codeHash": "sha256:dec69f883d67bc3ec81975a0a581edda056896d6eb515e9306018212978f84d0",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:09:13Z",
+      "tokensUsed": 233151
+    },
+    "0fc9760f938b641935cc843f76d91eb32062034feed9d9ad9f5434739fca79d3ec9591a53217340a63fe4f2207000363b866a025df8d1da38c8cb5e3e4b9a44f_2": {
+      "ruleId": "tmp.rules.javascript.lang.security.audit.unsafe-dynamic-method",
+      "file": "src/triggers.js",
+      "verdict": "uncertain",
+      "reason": "token budget exhausted (238137 of 120000 tokens used; the next call would exceed the budget)",
+      "evidence": null,
+      "codeHash": "sha256:1d7d744c411f0aed2a3c7adb42044b875f69eec0e5e7deb9c38efc9332e3e184",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:09:32Z",
+      "tokensUsed": 238137
+    },
+    "1170755d7644c43a1a53ebf318aa1209e86fc53d783b44909d04341576e09abc52addb09195c7dddda157fa91c32061c979de720136e6ff4c70d2db1654c54e7_0": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "src/AuthDataLock.js",
+      "verdict": "benign",
+      "reason": "The rule's concern (unstable JSON.stringify key ordering) cannot manifest here: the left operand `value` is filtered by isLockableAuthDataValue to only primitives (string/number/boolean) and arrays before reaching the stringify comparison (lines 25-27, 35-47), and JSON.stringify is deterministic for primitives and arrays — there are no object keys to reorder. Nested objects and Dates are explicitly excluded from locking. The right operand (newAuthData value) is unfiltered, but if it is an object or any type differing from the original, the stringified forms necessarily differ, which is the correct 'changed' signal for the optimistic lock; a spurious 'different' result would merely add an equality constraint on the original value, failing closed. Thus no incorrect behavior results from key-ordering instability.",
+      "evidence": [
+        "src/AuthDataLock.js:24-31",
+        "src/AuthDataLock.js:35-47"
+      ],
+      "codeHash": "sha256:32126aa5fd219a7824e47c5ae9c9323004a6c5b8ae10d1265ff36b5b00e26068",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:09:58Z",
+      "tokensUsed": 3703
+    },
+    "13f5994f1525208908aa1a4c59e58739d1430f00d842cc8c97b8119b5557592fc4ae6c7417b2248ce936a4ebb90bb7f6cb79e92969af76dd6709ee3c2aa5a7c4_0": {
+      "ruleId": "tmp.rules.javascript.lang.security.audit.detect-non-literal-regexp",
+      "file": "src/Adapters/Storage/Mongo/MongoTransform.js",
+      "verdict": "uncertain",
+      "reason": "token budget exhausted (111234 of 120000 tokens used; the next call would exceed the budget)",
+      "evidence": null,
+      "codeHash": "sha256:46b8dc29d06cd30461259172009e07f68767f88fbc13a54fdabe7b7a58519a45",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:13:04Z",
+      "tokensUsed": 111234
+    },
+    "18e66f0bb870d39d515a125b4954e0edccf812b0aa74dd228e159df99987e60deda782368057939c88581dc1acc0aa75b692ea921577ce3cecc7172871954892_0": {
+      "ruleId": "tmp.rules.javascript.lang.best-practice.lazy-load-module",
+      "file": "spec/FileDownload.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged lazy require is inside a helper function in a Jasmine test spec (spec/FileDownload.spec.js), not production server code. The rule itself is a best-practice/style warning about module load timing, not a security defect; no attacker-controlled input is involved, and the synchronous require at worst adds negligible latency in a test run. The same pattern repeats throughout the spec (e.g., lines 67, 80, 101) without any exploitable consequence, so there is no real defect to act on beyond a stylistic preference.",
+      "evidence": [
+        "spec/FileDownload.spec.js:49-62",
+        "spec/FileDownload.spec.js:3",
+        "spec/FileDownload.spec.js:50"
+      ],
+      "codeHash": "sha256:a31145783440ee021ce6b067f0c4847f080a38df4911e0eb8d4b9a4992187d95",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:13:05Z",
+      "tokensUsed": 4959
+    },
+    "1f4ca0d642f88c177bffb2cfae0d870e161c2a1fe0a03d8d8e7f8657eb7ee781afa122cb4332ba02f383daaef571bf021b8e41b12bae3478522356b26b92095d_0": {
+      "ruleId": "tmp.rules.javascript.lang.best-practice.lazy-load-module",
+      "file": "benchmark/performance.js",
+      "verdict": "benign",
+      "reason": "The flagged code is a style/best-practice warning, not a security defect: `require('express')` appears inside `initializeParseServer()` (benchmark/performance.js:39-41), but that function is invoked exactly once, at benchmark harness startup (called from runBenchmarks at benchmark/performance.js:878), which itself only runs when the file is executed directly as a script (benchmark/performance.js:956-958). The synchronous require therefore executes a single time during one-time initialization of a local benchmarking tool, not in any request-handling path, so it cannot block concurrent requests. No attacker-controlled input is involved and no security-relevant behavior exists; the lazy-load pattern here has no exploitable impact in this codebase.",
+      "evidence": [
+        "benchmark/performance.js:39-41",
+        "benchmark/performance.js:878",
+        "benchmark/performance.js:955-958"
+      ],
+      "codeHash": "sha256:a2f3700ef36713d5f0ccc79c3252b95258246eeeb9f0ba3500688d7844c9a945",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:13:39Z",
+      "tokensUsed": 18425
+    },
+    "1f4ca0d642f88c177bffb2cfae0d870e161c2a1fe0a03d8d8e7f8657eb7ee781afa122cb4332ba02f383daaef571bf021b8e41b12bae3478522356b26b92095d_1": {
+      "ruleId": "tmp.rules.javascript.lang.best-practice.lazy-load-module",
+      "file": "benchmark/performance.js",
+      "verdict": "benign",
+      "reason": "The flagged lazy require is a best-practice style finding, not a security defect. benchmark/performance.js is a standalone CI benchmark script (run via `npm run benchmark` / `require.main === module` at line 956-958), not a request-serving server. The require at line 41 sits inside initializeParseServer(), which is invoked exactly once at script startup (line 878) before the benchmark loop runs and before the local test server on port 1337 handles any requests, so the synchronous-load concern about blocking in-flight requests does not apply. The require argument is a static string literal ('../lib/index.js'), so no attacker-controlled input reaches it.",
+      "evidence": [
+        "benchmark/performance.js:39-41",
+        "benchmark/performance.js:878",
+        "benchmark/performance.js:956-960"
+      ],
+      "codeHash": "sha256:12df20e6e61d9268465d1fc6840b20e6cb26bd1f6e38c265cdebf85bb2659abc",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:13:39Z",
+      "tokensUsed": 12927
+    },
+    "2d524f34aed83fd3e65d7ffe22fe150f396372382fa654be8c56899ec625d6fb2c85a17248671f5a1eaf60dfb1e8a042dd7eeabe7a84b3674c97ecdd5d1e1e74_0": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.Aggregate.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged JSON.stringify is in a test helper `get` (spec/ParseQuery.Aggregate.spec.js:58-69) that serializes each value of `options.qs` (copied from the test-defined `options.body`) into a string so it can be sent as an HTTP query parameter via `request`. The stringified output is used as a query-string value, not as an object key, cache key, or anything depending on stable key ordering, so the rule's core concern (unstable key ordering for producing keys) does not apply. The input is also not attacker-controlled: `options.body` is constructed from hardcoded pipeline objects inside the test cases (e.g., lines 91-95, 103-107), and this is a spec file that never runs in production.",
+      "evidence": [
+        "spec/ParseQuery.Aggregate.spec.js:58-69",
+        "spec/ParseQuery.Aggregate.spec.js:91-99",
+        "spec/ParseQuery.Aggregate.spec.js:103-108"
+      ],
+      "codeHash": "sha256:33cc8a8be47470f7b0ab7b408f49259f3da4847f6a226266382da7d447f58732",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:14:03Z",
+      "tokensUsed": 6825
+    },
+    "2d524f34aed83fd3e65d7ffe22fe150f396372382fa654be8c56899ec625d6fb2c85a17248671f5a1eaf60dfb1e8a042dd7eeabe7a84b3674c97ecdd5d1e1e74_1": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.Aggregate.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged JSON.stringify is in a test helper (`get`) that serializes test-defined request body fields into query-string parameter values, not into object keys. The rule concerns relying on JSON.stringify for stable key ordering (e.g., cache/map keys); here the stringified output is assigned as a value (`options.qs[key] = ...`) and sent via `request()` to the test server, which parses JSON regardless of key order. The input (`options.body`) is hardcoded test data constructed inside the spec (e.g., lines 91-95, 103-107), not attacker-controlled, and this file is test code that never runs in production. There is no security or correctness impact.",
+      "evidence": [
+        "spec/ParseQuery.Aggregate.spec.js:58-69",
+        "spec/ParseQuery.Aggregate.spec.js:90-100",
+        "spec/ParseQuery.Aggregate.spec.js:102-108"
+      ],
+      "codeHash": "sha256:e8de9eb914f54e538a48afd1baf1201ca6d24d719e6752649ed9138b4e45409b",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:14:26Z",
+      "tokensUsed": 6791
+    },
+    "325fc15f5ac59890c03bedf296ed39b059512389366c1aa365c5bc4800a97a987217b1418782034a300544e575d2645368c5443d0794070655616e9b179fe264_0": {
+      "ruleId": "tmp.rules.javascript.lang.best-practice.lazy-load-module",
+      "file": "spec/ParseLiveQueryServer.spec.js",
+      "verdict": "benign",
+      "reason": "The flagged require is inside addMockClient, a Jasmine test helper in spec/ParseLiveQueryServer.spec.js (test-only code, not production). The module path is a hard-coded static string literal '../lib/LiveQuery/Client' with no attacker-controlled input reaching it. The rule is a code-style/best-practice warning about synchronous lazy loading, not a security sink; there is no taint path or security impact.",
+      "evidence": [
+        "spec/ParseLiveQueryServer.spec.js:1916-1922",
+        "spec/ParseLiveQueryServer.spec.js:1907-1914"
+      ],
+      "codeHash": "sha256:898d2de82f697795510a6e00b964fe60c10506028ee833cebdb365ba9f9450bb",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:14:45Z",
+      "tokensUsed": 4967
+    },
+    "3378a28c12628c80ba3f657207aaaa1ebec89c955c0d1e8e23f3a2c9d306b1757fb8b24ba7d2bb0203fca64ae1576425a70d62ce80a0abd71f3f8b1b16d712df_0": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "In a test spec, JSON.stringify({ objectId: obj.id }) at line 3382 builds the 'where' query-string parameter of an HTTP request (lines 3378-3385). The serialized string is sent to the server to be parsed as a query constraint; it is never used as an object key, map key, or cache key where stable ordering would matter, and the literal has a single key so ordering is moot. The scanner's taint flow into response5.data.results[0] is spurious: response5 is the awaited HTTP response, not data derived from the stringify output.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3378-3386",
+        "spec/ParseQuery.spec.js:3382"
+      ],
+      "codeHash": "sha256:1d6a77ba3a1512f43bda72bf26ca1cd7a288dd46916551fc58749e11f9694898",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:15:23Z",
+      "tokensUsed": 15190
+    },
+    "3378a28c12628c80ba3f657207aaaa1ebec89c955c0d1e8e23f3a2c9d306b1757fb8b24ba7d2bb0203fca64ae1576425a70d62ce80a0abd71f3f8b1b16d712df_1": {
+      "ruleId": "tmp.rules.javascript.lang.correctness.no-stringify-keys",
+      "file": "spec/ParseQuery.spec.js",
+      "verdict": "benign",
+      "reason": "The JSON.stringify at line 3382 serializes a single-key object ({ objectId: obj.id }) into the 'where' query-string parameter of an HTTP request to the Parse server inside a test. The string is not used as an object/cache key requiring stable ordering — it is parsed as JSON by the server, so key ordering is irrelevant, and with one key ordering is trivially deterministic. The scanner's trace (stringify -\u003e response5 -\u003e response5.data.results[0]) is spurious: response5 is the awaited HTTP response (line 3378), not derived from the stringify output, and the flagged line 3387 merely asserts a field on the response. No reliance on stable key ordering exists.",
+      "evidence": [
+        "spec/ParseQuery.spec.js:3378-3385",
+        "spec/ParseQuery.spec.js:3386-3391"
+      ],
+      "codeHash": "sha256:804d065a1c0ce037f8163a466aa9ebe1bf6f94094c07071af29d20bc957a38f4",
+      "model": "kimi-k3",
+      "effort": "large",
+      "agentVersion": 1,
+      "decidedAt": "2026-07-25T08:15:46Z",
+      "tokensUsed": 8000
+    }
+  }
+}
