@@ -69,7 +69,7 @@ jobs:
           api-key: ${{ secrets[steps.endpoint.outputs.key_name] }}
           base-url: ${{ steps.endpoint.outputs.base_url }}
           max-findings-budget: 0
-          #parallel: 3 # 4
+          parallel: 3
           sarif-file: findings.sarif
           effort: large
           scope: full
